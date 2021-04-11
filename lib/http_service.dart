@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 
 class HttpService {
   Dio _dio;
-  final baseUrl = "https://watching-server-production.herokuapp.com/v1/";
+  final baseUrl = "https://watching-server-production.herokuapp.com/v1";
+
 
   HttpService() {
     _dio = Dio(
@@ -11,7 +12,7 @@ class HttpService {
       )
     );
 
-    initializeInterceptors();
+    //initializeInterceptors();
   }
 
   /// This function is used for get requests
@@ -27,14 +28,21 @@ class HttpService {
   }
 
   /// This function is used for post requests
-  Future<Response> postRequest(String endPoint, Map data) async {
+  Future<Response> postRequest(String endPoint, dynamic data) async {
     Response response;
     try {
+      print(_dio.options.baseUrl);
+      _dio.options.headers['content-Type'] = 'application/json';
       response = await _dio.post(endPoint, data: data);
+      //Dio dio = Dio();
+      //response = await dio.post("https://watching-server-production.herokuapp.com/v1/users", data: data);
     } on DioError catch(e) {
       print(e.message);
       throw Exception(e.message);
+    } on Exception catch(e) {
+      print(e);
     }
+    return response;
   }
 
   initializeInterceptors(){
@@ -51,5 +59,6 @@ class HttpService {
     ));
 
   }
+
 
 }

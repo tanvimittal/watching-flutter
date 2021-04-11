@@ -1,14 +1,53 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:watching_flutter/http_service.dart';
+import 'package:watching_flutter/model/phone_number_post.dart';
+import 'package:watching_flutter/model/user.dart';
+import 'package:watching_flutter/model/user_post.dart';
 
-class PhoneNumber extends StatelessWidget {
+import '../http_service.dart';
 
+class PhoneNumber extends StatefulWidget {
+  @override
+  _PhoneNumberState createState() => _PhoneNumberState();
+}
+
+class _PhoneNumberState extends State<PhoneNumber> {
+  final myController = TextEditingController();
   HttpService http;
-  Future getUser () async {
+
+
+  Future getUser (PhoneNumberPost phoneNumber) async {
+    Response response;
+
+    try {
+      response = await http.postRequest("/users", phoneNumber.toJson());
+      print('In api');
+      if(response.statusCode == 200) {
+        User user = User.fromJson(response.data);
+        print(user.apiKey);
+      } else {
+        print("Some error occured");
+      }
+      //if (response)
+    } on Exception catch(e) {
+      print(e);
+    }
     //http.postRequest("/users", "fd");
   }
 
+  @override
+  void dispose() {
+    // Clean the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    http = HttpService();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,21 +61,32 @@ class PhoneNumber extends StatelessWidget {
                 decoration: new InputDecoration(labelText: "Enter your number"),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
-                ], // Only numbers can be entered
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                controller: myController, // Only numbers can be entered
               ),
               SizedBox(
                 height: 16.0,
               ),
               ElevatedButton(
-                  onPressed: (
-                      ){},
-              child: Text('登録'),)
+                onPressed: _registerUser,
+                child: Text('登録'),
+              )
             ],
           )),
     );
   }
 
+  void _registerUser() {
+    String phoneNumber = myController.text;
+    UserPost userPost = UserPost(countryCode: "JP", original: phoneNumber);
+    print(userPost.original);
+    getUser(PhoneNumberPost(userPost: userPost));
+  }
 
-  
+  _developerlibs() async {
+    var dio = Dio();
+    Response response = await dio.get('https://www.google.com/');
+    print(response.data);
+  }
 }
