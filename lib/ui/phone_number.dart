@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:watching_flutter/model/phone_number_post.dart';
 import 'package:watching_flutter/model/user.dart';
 import 'package:watching_flutter/model/user_post.dart';
+import 'package:watching_flutter/ui/alert_dialog_error.dart';
 
 import '../http_service.dart';
 
@@ -77,16 +78,32 @@ class _PhoneNumberState extends State<PhoneNumber> {
     );
   }
 
+  // This function will register user on server
   void _registerUser() {
     String phoneNumber = myController.text;
     UserPost userPost = UserPost(countryCode: "JP", original: phoneNumber);
-    print(userPost.original);
-    getUser(PhoneNumberPost(userPost: userPost));
+    phoneNumber = check(phoneNumber);
+    if (phoneNumber!=null) {
+      print(userPost.original);
+      getUser(PhoneNumberPost(userPost: userPost));
+    }
   }
 
-  _developerlibs() async {
-    var dio = Dio();
-    Response response = await dio.get('https://www.google.com/');
-    print(response.data);
+  /// This function takes phoneNumber and returns phone number after deleting first
+  /// number, if it is of 11 digits
+  String check(String phoneNumber) {
+    if (phoneNumber.isEmpty) {
+      ShowDialog.showAlertDialog(context, 'エラー', '電話番号を入力してください。');
+      return null;
+    }
+
+    if (phoneNumber.length !=11 ) {
+      ShowDialog.showAlertDialog(context, 'エラー', '電話番号の桁数に誤りがあります。');
+      return null;
+    }
+
+    return phoneNumber.substring(1);
+
   }
+
 }
