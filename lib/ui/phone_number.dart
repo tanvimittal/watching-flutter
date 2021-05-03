@@ -7,6 +7,7 @@ import 'package:watching_flutter/model/user_post.dart';
 import 'package:watching_flutter/ui/alert_dialog_error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watching_flutter/ui/nickname.dart';
+import 'package:watching_flutter/globals.dart' as globals;
 
 import '../http_service.dart';
 
@@ -31,6 +32,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
         print(user.apiKey);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('api_key', user.apiKey);
+        globals.apiKey = user.apiKey;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => Nickname()),

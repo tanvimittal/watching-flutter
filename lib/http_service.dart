@@ -46,11 +46,14 @@ class HttpService {
   }
 
   /// This function is used for put requests
-  Future<Response> putRequest(String endPoint, dynamic data) async {
+  Future<Response> putRequest(String endPoint, dynamic data, [String apiKey]) async {
     Response response;
     try {
       print(_dio.options.baseUrl);
       _dio.options.headers['content-Type'] = 'application/json';
+      if (apiKey.isNotEmpty) {
+        _dio.options.headers["x-api-key"] = apiKey;
+      }
       response = await _dio.put(endPoint, data: data);
       //Dio dio = Dio();
       //response = await dio.post("https://watching-server-production.herokuapp.com/v1/users", data: data);

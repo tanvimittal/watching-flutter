@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watching_flutter/ui/landing_page.dart';
 import 'package:watching_flutter/ui/phone_number.dart';
 
 
@@ -33,5 +34,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return PhoneNumber();
+    //return LandingPage();
   }
 }

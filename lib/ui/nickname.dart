@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:watching_flutter/model/nickname_post.dart';
 import 'package:watching_flutter/ui/alert_dialog_error.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watching_flutter/ui/common_bottom_navigation.dart';
+import 'package:watching_flutter/globals.dart' as globals;
 
 import '../http_service.dart';
 
@@ -21,11 +23,18 @@ class _NicknameState extends State<Nickname> {
     Response response;
 
     try {
-      response = await http.putRequest("/users", nicknamePost.toJson());
-      print('In api');
+      print(nicknamePost.toJson());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      response = await http.putRequest("/users", nicknamePost.toJson(), globals.apiKey);
       if(response.statusCode == 200) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('nickname', nicknamePost.nickname);
+        globals.nickname = nicknamePost.nickname;
+        print('Done');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => CommonBottomNavigation()),
+              (Route<dynamic> route) => false,
+        );
       } else if (response.statusCode == 500) {
         ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
       }
