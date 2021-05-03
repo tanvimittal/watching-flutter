@@ -5,6 +5,8 @@ import 'package:watching_flutter/model/phone_number_post.dart';
 import 'package:watching_flutter/model/user.dart';
 import 'package:watching_flutter/model/user_post.dart';
 import 'package:watching_flutter/ui/alert_dialog_error.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watching_flutter/ui/nickname.dart';
 
 import '../http_service.dart';
 
@@ -27,8 +29,15 @@ class _PhoneNumberState extends State<PhoneNumber> {
       if(response.statusCode == 200) {
         User user = User.fromJson(response.data);
         print(user.apiKey);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('api_key', user.apiKey);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Nickname()),
+              (Route<dynamic> route) => false,
+        );
       } else {
-        print("Some error occured");
+        ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
       }
       //if (response)
     } on Exception catch(e) {
@@ -58,8 +67,8 @@ class _PhoneNumberState extends State<PhoneNumber> {
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              new TextField(
-                decoration: new InputDecoration(labelText: "Enter your number"),
+              TextField(
+                decoration: InputDecoration(labelText: "Enter your number"),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly,

@@ -45,6 +45,24 @@ class HttpService {
     return response;
   }
 
+  /// This function is used for put requests
+  Future<Response> putRequest(String endPoint, dynamic data) async {
+    Response response;
+    try {
+      print(_dio.options.baseUrl);
+      _dio.options.headers['content-Type'] = 'application/json';
+      response = await _dio.put(endPoint, data: data);
+      //Dio dio = Dio();
+      //response = await dio.post("https://watching-server-production.herokuapp.com/v1/users", data: data);
+    } on DioError catch(e) {
+      print(e.message);
+      throw Exception(e.message);
+    } on Exception catch(e) {
+      print(e);
+    }
+    return response;
+  }
+
   initializeInterceptors(){
     _dio.interceptors.add(InterceptorsWrapper(
         onError: (error, handler){
