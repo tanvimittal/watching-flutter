@@ -17,7 +17,7 @@ class Request extends StatefulWidget {
 class _RequestState extends State<Request> {
   Widget _body = CircularProgressIndicator();
   HttpService http;
-  List<GetFollowRequests> getFollowRequests;
+  List<FollowRequest> getFollowRequests;
 
   Future _getRequests() async {
     Response response;
@@ -27,7 +27,7 @@ class _RequestState extends State<Request> {
       if (response.statusCode == 200) {
         final map = Map<String, dynamic>();
         var getAllRequests = response.data;
-        getFollowRequests = List<GetFollowRequests>.from(getAllRequests.map((i) => GetFollowRequests.fromJson(i)));
+        getFollowRequests = List<FollowRequest>.from(getAllRequests.map((i) => FollowRequest.fromJson(i)));
         setState(() =>
         _body = ListView.builder(
             padding: const EdgeInsets.all(8),

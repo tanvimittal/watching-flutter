@@ -6,8 +6,8 @@ part of 'follow_requests.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-GetFollowRequests _$GetFollowRequestsFromJson(Map<String, dynamic> json) {
-  return GetFollowRequests(
+FollowRequest _$FollowRequestFromJson(Map<String, dynamic> json) {
+  return FollowRequest(
     id: json['id'] as int,
     getUserRequests: json['from_user'] == null
         ? null
@@ -15,7 +15,7 @@ GetFollowRequests _$GetFollowRequestsFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$GetFollowRequestsToJson(GetFollowRequests instance) =>
+Map<String, dynamic> _$FollowRequestToJson(FollowRequest instance) =>
     <String, dynamic>{
       'id': instance.id,
       'from_user': instance.getUserRequests?.toJson(),
