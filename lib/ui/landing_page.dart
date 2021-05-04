@@ -32,14 +32,19 @@ class _LandingPageState extends State<LandingPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Both api_key and nickname are set
-    if(prefs.containsKey('api_key') && prefs.containsKey('nickname') && prefs.getString('api_key').isNotEmpty && prefs.getString('nickname').isNotEmpty) {
-        globals.apiKey = prefs.getString('api_key');
-        globals.nickname = prefs.getString('nickname');
-        setState(() => _body = CommonBottomNavigation());
+    if (prefs.containsKey('api_key') &&
+        prefs.containsKey('nickname') &&
+        prefs.getString('api_key').isNotEmpty &&
+        prefs.getString('nickname').isNotEmpty) {
+      globals.apiKey = prefs.getString('api_key');
+      globals.nickname = prefs.getString('nickname');
+      setState(() => _body = CommonBottomNavigation());
     }
 
     // if api_key is set but nickname isn't set
-    else if(prefs.containsKey('api_key') && !prefs.containsKey('nickname') && prefs.getString('api_key').isNotEmpty) {
+    else if (prefs.containsKey('api_key') &&
+        !prefs.containsKey('nickname') &&
+        prefs.getString('api_key').isNotEmpty) {
       globals.apiKey = prefs.getString('api_key');
       setState(() => _body = Nickname());
     }
@@ -48,7 +53,5 @@ class _LandingPageState extends State<LandingPage> {
     else {
       setState(() => _body = PhoneNumber());
     }
-
   }
-
 }

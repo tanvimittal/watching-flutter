@@ -16,26 +16,32 @@ class HttpService {
   }
 
   /// This function is used for get requests
-  Future<Response> getRequest(String endPoint) async{
+  Future<Response> getRequest(String endPoint, [String apiKey]) async {
     Response response;
-
     try {
+      print(_dio.options.baseUrl);
+      _dio.options.headers['content-Type'] = 'application/json';
+      if (apiKey.isNotEmpty) {
+        _dio.options.headers["x-api-key"] = apiKey;
+      }
       response = await _dio.get(endPoint);
     } on DioError catch(e) {
         print(e.message);
         throw Exception(e.message);
     }
+    return response;
   }
 
   /// This function is used for post requests
-  Future<Response> postRequest(String endPoint, dynamic data) async {
+  Future<Response> postRequest(String endPoint, dynamic data, [String apiKey]) async {
     Response response;
     try {
       print(_dio.options.baseUrl);
       _dio.options.headers['content-Type'] = 'application/json';
+      if (apiKey.isNotEmpty) {
+        _dio.options.headers["x-api-key"] = apiKey;
+      }
       response = await _dio.post(endPoint, data: data);
-      //Dio dio = Dio();
-      //response = await dio.post("https://watching-server-production.herokuapp.com/v1/users", data: data);
     } on DioError catch(e) {
       print(e.message);
       throw Exception(e.message);
@@ -55,8 +61,6 @@ class HttpService {
         _dio.options.headers["x-api-key"] = apiKey;
       }
       response = await _dio.put(endPoint, data: data);
-      //Dio dio = Dio();
-      //response = await dio.post("https://watching-server-production.herokuapp.com/v1/users", data: data);
     } on DioError catch(e) {
       print(e.message);
       throw Exception(e.message);

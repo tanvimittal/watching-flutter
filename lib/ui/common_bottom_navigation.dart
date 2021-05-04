@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watching_flutter/ui/request.dart';
 import 'package:watching_flutter/ui/user_search_page.dart';
 
 class CommonBottomNavigation extends StatefulWidget {
@@ -16,16 +17,14 @@ class _CommonBottomNavigationState extends State<CommonBottomNavigation> {
       'Index 0: イベント一覧',
       style: optionStyle,
     ),
-    Text(
-      'Index 1: リクエスト',
-      style: optionStyle,
-    ),
+    Request(),
     UserSearchPage(),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+
     });
   }
 
