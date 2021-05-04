@@ -33,7 +33,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return PhoneNumber();
-    //return LandingPage();
+    //return PhoneNumber();
+    return LandingPage();
   }
 }

@@ -11,51 +11,43 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-  Future<int> _mainPage;
+  Widget _body = CircularProgressIndicator();
 
   @override
   void initState() {
     super.initState();
-    _mainPage = _getInitialPage();
+    _getInitialPage();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_mainPage == 1) {
-      return PhoneNumber();
-    }
-
-    else if (_mainPage == 2) {
-      return Nickname();
-    }
-
-    else {
-     return CommonBottomNavigation();
-    }
+    return _body;
   }
 
   // This method returns which page to be called
   // 1: Call PhoneNumber
   // 2: Call Nickname
   // 3: Call CommmonBottomNavigation
-  Future<int> _getInitialPage() async {
+  Future _getInitialPage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // Both api_key and nickname are set
-    if(prefs.containsKey('api_key') && prefs.containsKey('nickname')) {
+    if(prefs.containsKey('api_key') && prefs.containsKey('nickname') && prefs.getString('api_key').isNotEmpty && prefs.getString('nickname').isNotEmpty) {
         globals.apiKey = prefs.getString('api_key');
         globals.nickname = prefs.getString('nickname');
-        return 3;
+        setState(() => _body = CommonBottomNavigation());
     }
 
     // if api_key is set but nickname isn't set
-    else if(prefs.containsKey('api_key') && !prefs.containsKey('nickname')) {
+    else if(prefs.containsKey('api_key') && !prefs.containsKey('nickname') && prefs.getString('api_key').isNotEmpty) {
       globals.apiKey = prefs.getString('api_key');
-      return 2;
+      setState(() => _body = Nickname());
     }
 
     // both are not set then return 1
-    return 1;
+    else {
+      setState(() => _body = PhoneNumber());
+    }
 
   }
 
