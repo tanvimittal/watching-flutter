@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watching_flutter/ui/user_search_page.dart';
 
 class CommonBottomNavigation extends StatefulWidget {
   @override
@@ -10,7 +11,7 @@ class _CommonBottomNavigationState extends State<CommonBottomNavigation> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     Text(
       'Index 0: イベント一覧',
       style: optionStyle,
@@ -19,10 +20,7 @@ class _CommonBottomNavigationState extends State<CommonBottomNavigation> {
       'Index 1: リクエスト',
       style: optionStyle,
     ),
-    Text(
-      'Index 2: 相手を探す',
-      style: optionStyle,
-    ),
+    UserSearchPage(),
   ];
 
   void _onItemTapped(int index) {
