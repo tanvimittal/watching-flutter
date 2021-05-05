@@ -4,19 +4,17 @@ class HttpService {
   Dio _dio;
   final baseUrl = "https://watching-server-production.herokuapp.com/v1";
 
-
   HttpService() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: baseUrl
-      )
-    );
+    _dio = Dio(BaseOptions(baseUrl: baseUrl));
+
+    // Show communication log
+    _dio.interceptors.add(LogInterceptor());
 
     //initializeInterceptors();
   }
 
   /// This function is used for get requests
-  Future<Response> getRequest(String endPoint, [String apiKey]) async {
+  Future<Response> getRequest(String endPoint, {String apiKey, Map<String, dynamic> queryParameters}) async {
     Response response;
     try {
       print(_dio.options.baseUrl);
@@ -24,16 +22,19 @@ class HttpService {
       if (apiKey.isNotEmpty) {
         _dio.options.headers["x-api-key"] = apiKey;
       }
-      response = await _dio.get(endPoint);
-    } on DioError catch(e) {
-        print(e.message);
-        throw Exception(e.message);
+      response = await _dio.get(
+        endPoint,
+        queryParameters: queryParameters,
+      );
+    } on DioError catch (e) {
+      print(e.message);
+      throw Exception(e.message);
     }
     return response;
   }
 
   /// This function is used for post requests
-  Future<Response> postRequest(String endPoint, dynamic data, [String apiKey]) async {
+  Future<Response> postRequest(String endPoint, dynamic data, {String apiKey}) async {
     Response response;
     try {
       print(_dio.options.baseUrl);
@@ -42,17 +43,17 @@ class HttpService {
         _dio.options.headers["x-api-key"] = apiKey;
       }
       response = await _dio.post(endPoint, data: data);
-    } on DioError catch(e) {
+    } on DioError catch (e) {
       print(e.message);
       throw Exception(e.message);
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       print(e);
     }
     return response;
   }
 
   /// This function is used for put requests
-  Future<Response> putRequest(String endPoint, dynamic data, [String apiKey]) async {
+  Future<Response> putRequest(String endPoint, dynamic data, {String apiKey}) async {
     Response response;
     try {
       print(_dio.options.baseUrl);
@@ -61,29 +62,22 @@ class HttpService {
         _dio.options.headers["x-api-key"] = apiKey;
       }
       response = await _dio.put(endPoint, data: data);
-    } on DioError catch(e) {
+    } on DioError catch (e) {
       print(e.message);
       throw Exception(e.message);
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       print(e);
     }
     return response;
   }
 
-  initializeInterceptors(){
-    _dio.interceptors.add(InterceptorsWrapper(
-        onError: (error, handler){
-          print(error.message);
-        },
-        onRequest: (request, handler){
-          print("${request.method} ${request.path}");
-        },
-        onResponse: (response, handler){
-          print(response.data);
-        }
-    ));
-
+  initializeInterceptors() {
+    _dio.interceptors.add(InterceptorsWrapper(onError: (error, handler) {
+      print(error.message);
+    }, onRequest: (request, handler) {
+      print("${request.method} ${request.path}");
+    }, onResponse: (response, handler) {
+      print(response.data);
+    }));
   }
-
-
 }

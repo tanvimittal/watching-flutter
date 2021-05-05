@@ -23,7 +23,7 @@ class _RequestState extends State<Request> {
     Response response;
 
     try {
-      response = await http.getRequest("/follow_requests", globals.apiKey);
+      response = await http.getRequest("/follow_requests", apiKey: globals.apiKey);
       if (response.statusCode == 200) {
         final map = Map<String, dynamic>();
         var getAllRequests = response.data;

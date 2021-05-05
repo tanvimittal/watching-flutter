@@ -25,7 +25,7 @@ class _NicknameState extends State<Nickname> {
     try {
       print(nicknamePost.toJson());
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      response = await http.putRequest("/users", nicknamePost.toJson(), globals.apiKey);
+      response = await http.putRequest("/users", nicknamePost.toJson(), apiKey: globals.apiKey);
       if(response.statusCode == 200) {
         prefs.setString('nickname', nicknamePost.nickname);
         globals.nickname = nicknamePost.nickname;
