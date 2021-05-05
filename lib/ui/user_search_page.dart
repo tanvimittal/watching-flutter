@@ -1,13 +1,23 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:watching_flutter/http_service.dart';
+import 'package:watching_flutter/model/user.dart';
+import 'package:watching_flutter/globals.dart' as globals;
 
-class UserSearchPage extends StatelessWidget {
-  final myController = TextEditingController();
+import 'alert_dialog_error.dart';
+
+class UserSearchPage extends StatefulWidget {
+  @override
+  _UserSearchPageState createState() => _UserSearchPageState();
+}
+
+class _UserSearchPageState extends State<UserSearchPage> {
+  final _phoneNumberController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Container(
           padding: const EdgeInsets.all(40.0),
           child: new Column(
@@ -21,11 +31,12 @@ class UserSearchPage extends StatelessWidget {
                 height: 8.0,
               ),
               TextField(
+                maxLength: 11,
                 keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                ],
-                controller: myController, // Only numbers can be entered
-                maxLength: 11,  // Only for Japan
+                controller: _phoneNumberController,
+                decoration: InputDecoration(
+                  hintText: "ハイフン区切りなし、数字のみ",
+                ),
               ),
               SizedBox(
                 height: 16.0,
@@ -40,6 +51,35 @@ class UserSearchPage extends StatelessWidget {
   }
 
   void _searchUser() {
-    print(myController.text);
+    print(_phoneNumberController.text);
+    // TODO: Validation
+    // TODO: Transfer from Japanese phone number seriously
+    _sendGetUsers("+81${_phoneNumberController.text.substring(1)}");
+  }
+
+  // TODO: UI では通信を意識させない
+  void _sendGetUsers(String phoneNumber) async {
+    final http = HttpService(); // TODO: Singleton
+    Response response;
+
+    try {
+      response = await http.getRequest(
+        "/users",
+        apiKey: globals.apiKey,
+        queryParameters: {"phone_number": phoneNumber},
+      );
+      print(response);
+      // TODO: Add codes to show result of searching
+
+      if (response.statusCode == 200) {
+        User user = User.fromJson(response.data);
+        print(user.apiKey);
+      } else {
+        // TODO: エラー処理は UI 部分で行う
+        ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+      }
+    } on Exception catch (e) {
+      ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+    }
   }
 }
