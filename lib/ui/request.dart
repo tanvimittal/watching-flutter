@@ -34,11 +34,26 @@ class _RequestState extends State<Request> {
             itemCount: getFollowRequests.length,
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                height: 50,
-                child: Center(
-                  child: Text(
-                    '${getFollowRequests[index].getUserRequests
+                height: 100,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text('${getFollowRequests[index].getUserRequests
                         .nickname}からリクエストが来ました。!'),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextButton(onPressed: (){},
+                            child: Text('承認')),
+                        TextButton(onPressed: (){}
+                          , child: Text('拒否'),)
+                      ],
+                    ),
+
+                  ],
                 ),
               );
             }
