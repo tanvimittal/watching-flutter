@@ -15,57 +15,74 @@ class Request extends StatefulWidget {
 }
 
 class _RequestState extends State<Request> {
-  Widget _body = CircularProgressIndicator();
+  bool _widgetLoaded = false;
   HttpService http;
-  List<FollowRequest> getFollowRequests;
+  List<FollowRequest> getFollowRequests = [];
 
-  Future _getRequests() async {
+  // this function is used to reject requests
+  Future _rejectRequest (String id, int index) async {
     Response response;
 
     try {
+      response = await http.postRequest("/follow_requests/$id/decline", apiKey: globals.apiKey);
+      if(response.statusCode == 200) {
+        _updateState(index);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("リクエストを拒否しました。"),
+        ));
+        print('Request Rejected');
+      } else if (response.statusCode == 500) {
+        ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+      }
+      //if (response)
+    } on Exception catch(e) {
+      print(e);
+    }
+  }
+
+  // this function is used to accept requests
+  Future _acceptRequest (String id, int index) async {
+    Response response;
+
+    try {
+      response = await http.postRequest("/follow_requests/$id/accept", apiKey: globals.apiKey);
+      if(response.statusCode == 200) {
+        _updateState(index);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("リクエストを承認しました。"),
+        ));
+      } else if (response.statusCode == 500) {
+        ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+      }
+    } on Exception catch(e) {
+      print(e);
+    }
+  }
+
+  // This is used for removing id from list
+  void _updateState(int index) {
+    setState(() {
+      getFollowRequests.removeAt(index);
+    });
+  }
+
+  Future _getRequests() async {
+    Response response;
+    try {
       response = await http.getRequest("/follow_requests", apiKey: globals.apiKey);
       if (response.statusCode == 200) {
-        final map = Map<String, dynamic>();
         var getAllRequests = response.data;
         getFollowRequests = List<FollowRequest>.from(getAllRequests.map((i) => FollowRequest.fromJson(i)));
-        setState(() =>
-        _body = ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: getFollowRequests.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                height: 100,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text('${getFollowRequests[index].getUserRequests
-                        .nickname}からリクエストが来ました。!'),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextButton(onPressed: (){},
-                            child: Text('承認')),
-                        TextButton(onPressed: (){}
-                          , child: Text('拒否'),)
-                      ],
-                    ),
-
-                  ],
-                ),
-              );
-            }
-        ));
       } else {
         ShowDialog.showAlertDialog(context, 'エラー',
             'Some error occured on server side please try after sometime.');
       }
+      setState(() {
+        _widgetLoaded = true;
+      });
     } on Exception catch (e) {
       print(e);
     }
-    //http.postRequest("/users", "fd");
   }
 
   @override void initState() {
@@ -76,7 +93,35 @@ class _RequestState extends State<Request> {
 
   @override
   Widget build(BuildContext context) {
-    return _body;
+    return _widgetLoaded ? ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: getFollowRequests.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+          key: UniqueKey(),
+            height: 100,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                Text('${getFollowRequests[index].getUserRequests
+                    .nickname}からリクエストが来ました。!'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextButton(onPressed:() => _acceptRequest(getFollowRequests[index].id.toString(), index),
+                        child: Text('承認')),
+                    TextButton( child: Text('拒否'),
+                      onPressed:() => _rejectRequest(getFollowRequests[index].id.toString(), index) ,
+                    )
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+    ): CircularProgressIndicator();
   }
-
 }

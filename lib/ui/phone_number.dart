@@ -25,7 +25,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
     Response response;
 
     try {
-      response = await http.postRequest("/users", phoneNumber.toJson());
+      response = await http.postRequest("/users", data: phoneNumber.toJson());
       print('In api');
       if(response.statusCode == 200) {
         User user = User.fromJson(response.data);

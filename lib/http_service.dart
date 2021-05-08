@@ -10,7 +10,6 @@ class HttpService {
     // Show communication log
     _dio.interceptors.add(LogInterceptor());
 
-    //initializeInterceptors();
   }
 
   /// This function is used for get requests
@@ -34,7 +33,7 @@ class HttpService {
   }
 
   /// This function is used for post requests
-  Future<Response> postRequest(String endPoint, dynamic data, {String apiKey}) async {
+  Future<Response> postRequest(String endPoint, {dynamic data, String apiKey}) async {
     Response response;
     try {
       print(_dio.options.baseUrl);
@@ -71,13 +70,4 @@ class HttpService {
     return response;
   }
 
-  initializeInterceptors() {
-    _dio.interceptors.add(InterceptorsWrapper(onError: (error, handler) {
-      print(error.message);
-    }, onRequest: (request, handler) {
-      print("${request.method} ${request.path}");
-    }, onResponse: (response, handler) {
-      print(response.data);
-    }));
-  }
 }

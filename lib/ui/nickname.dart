@@ -29,7 +29,6 @@ class _NicknameState extends State<Nickname> {
       if(response.statusCode == 200) {
         prefs.setString('nickname', nicknamePost.nickname);
         globals.nickname = nicknamePost.nickname;
-        print('Done');
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => CommonBottomNavigation()),
@@ -42,7 +41,6 @@ class _NicknameState extends State<Nickname> {
     } on Exception catch(e) {
       print(e);
     }
-    //http.postRequest("/users", "fd");
   }
 
   @override
