@@ -8,6 +8,9 @@ class User {
   @JsonKey(name: "id")
   int id;
 
+  @JsonKey(name: "nickname")
+  String nickname;
+
   @JsonKey(name: "api_key")
   String apiKey;
 

@@ -73,11 +73,77 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
       if (response.statusCode == 200) {
         User user = User.fromJson(response.data);
-        print(user.apiKey);
+        // TODO: ニックネームない場合はどうする？
+        showConfirmDialog(context, user);
+        // TODO: ダイアログが戻ってきたらここが動く？
       } else {
+        // TODO: 見つからなかった場合の処理
         // TODO: エラー処理は UI 部分で行う
         ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
       }
+    } on Exception catch (e) {
+      ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+    }
+  }
+
+  // TODO: 後で別のファイルに
+  // TODO: Future 返す必要あるか？
+  Future<void> showConfirmDialog(BuildContext context, User user) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "リクエスト確認",
+            style: TextStyle(color: Colors.black),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  "${user.nickname} さんにリクエストを送りますか？",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'いいえ',
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // TODO: 電話番号を残しておく？
+              },
+            ),
+            TextButton(
+              child: Text(
+                'はい',
+              ),
+              onPressed: () {
+                _sendPostFollowRequest(1);
+                Navigator.of(context).pop();
+                // TODO: 送る
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _sendPostFollowRequest(int userId) async {
+    final http = HttpService(); // TODO: Singleton
+    Response response;
+
+    try {
+      response = await http.postRequest(
+        "/follow_requests",
+        apiKey: globals.apiKey,
+      );
+      print(response);
     } on Exception catch (e) {
       ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
     }
