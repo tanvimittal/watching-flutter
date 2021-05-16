@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:watching_flutter/model/follow_requests.dart';
+import 'package:watching_flutter/model/follow_request.dart';
 import 'package:watching_flutter/ui/alert_dialog_error.dart';
 import 'package:watching_flutter/globals.dart' as globals;
 

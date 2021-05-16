@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:watching_flutter/http_service.dart';
+import 'package:watching_flutter/model/follow_request.dart';
 import 'package:watching_flutter/model/user.dart';
 import 'package:watching_flutter/globals.dart' as globals;
 
@@ -123,7 +126,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
                 'はい',
               ),
               onPressed: () {
-                _sendPostFollowRequest(1);
+                _sendPostFollowRequest(user.id);
                 Navigator.of(context).pop();
                 // TODO: 送る
               },
@@ -139,9 +142,11 @@ class _UserSearchPageState extends State<UserSearchPage> {
     Response response;
 
     try {
+      print(FollowRequest(userId: userId).toJson());
       response = await http.postRequest(
         "/follow_requests",
         apiKey: globals.apiKey,
+        data: FollowRequest(userId: userId).toJson(),
       );
       print(response);
     } on Exception catch (e) {
