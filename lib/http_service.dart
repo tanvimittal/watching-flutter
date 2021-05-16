@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 
 class HttpService {
   Dio _dio;
-  final baseUrl = "https://watching-server-production.herokuapp.com/v1";
+  //final baseUrl = "https://watching-server-production.herokuapp.com/v1";
+  final baseUrl = "https://watching-server-staging.herokuapp.com/v1";
 
   HttpService() {
     _dio = Dio(BaseOptions(baseUrl: baseUrl));
@@ -38,7 +39,7 @@ class HttpService {
     try {
       print(_dio.options.baseUrl);
       _dio.options.headers['content-Type'] = 'application/json';
-      if (apiKey.isNotEmpty) {
+      if (apiKey ==null || apiKey.isNotEmpty) {
         _dio.options.headers["x-api-key"] = apiKey;
       }
       response = await _dio.post(endPoint, data: data);
@@ -57,7 +58,7 @@ class HttpService {
     try {
       print(_dio.options.baseUrl);
       _dio.options.headers['content-Type'] = 'application/json';
-      if (apiKey.isNotEmpty) {
+      if (apiKey ==null || apiKey.isNotEmpty) {
         _dio.options.headers["x-api-key"] = apiKey;
       }
       response = await _dio.put(endPoint, data: data);
