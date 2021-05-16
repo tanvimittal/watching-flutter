@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -62,11 +60,10 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
   // TODO: UI では通信を意識させない
   void _sendGetUsers(String phoneNumber) async {
-    final http = HttpService(); // TODO: Singleton
-    Response response;
+    final http = HttpService();
 
     try {
-      response = await http.getRequest(
+      Response response = await http.getRequest(
         "/users",
         apiKey: globals.apiKey,
         queryParameters: {"phone_number": phoneNumber},
@@ -78,14 +75,27 @@ class _UserSearchPageState extends State<UserSearchPage> {
         User user = User.fromJson(response.data);
         // TODO: ニックネームない場合はどうする？
         showConfirmDialog(context, user);
-        // TODO: ダイアログが戻ってきたらここが動く？
+        // TODO: ダイアログ表示は await しておいた方がいい？
       } else {
-        // TODO: 見つからなかった場合の処理
-        // TODO: エラー処理は UI 部分で行う
+        // TODO: 普通はここに来ない？ドキュメントとか裏を取りたい。
         ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
       }
-    } on Exception catch (e) {
-      ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+    } on DioError catch (e) {
+      // TODO: エラー処理は UI 部分で行う
+      if (e.response != null) {
+        if (e.response.statusCode == 404) {
+          ShowDialog.showAlertDialog(context, 'エラー', '相手の電話番号が登録されていません。');
+        } else {
+          ShowDialog.showAlertDialog(context, 'エラー', 'サーバーからのレスポンスが不正です。');
+        }
+      } else {
+        // 通信系のエラー
+        ShowDialog.showAlertDialog(context, 'エラー', 'ネットワーク環境を確認するか、時間をおいて再度試してください。');
+      }
+    } catch (e) {
+      // TODO: どう処理する？上に投げてもいいかも。
+      ShowDialog.showAlertDialog(context, 'エラー', 'Fatal error occurred.');
+      print(e);  // TODO: ログ出力 and もっとすぐに気づくように
     }
   }
 
@@ -138,17 +148,19 @@ class _UserSearchPageState extends State<UserSearchPage> {
   }
 
   void _sendPostFollowRequest(int userId) async {
-    final http = HttpService(); // TODO: Singleton
-    Response response;
+    final http = HttpService();
 
     try {
       print(FollowRequest(userId: userId).toJson());
-      response = await http.postRequest(
+      await http.postRequest(
         "/follow_requests",
         apiKey: globals.apiKey,
         data: FollowRequest(userId: userId).toJson(),
       );
-      print(response);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("見守りリクエストを送りました。"),
+      ));
     } on Exception catch (e) {
       ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
     }
