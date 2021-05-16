@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watching_flutter/ui/events.dart';
 import 'package:watching_flutter/ui/request.dart';
 import 'package:watching_flutter/ui/user_search_page.dart';
 
@@ -13,10 +14,7 @@ class _CommonBottomNavigationState extends State<CommonBottomNavigation> {
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: イベント一覧',
-      style: optionStyle,
-    ),
+    Events(),
     Request(),
     UserSearchPage(),
   ];

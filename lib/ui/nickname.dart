@@ -86,7 +86,7 @@ class _NicknameState extends State<Nickname> {
   // This function will register user on server
   void _registerNickname() {
     String nickName = myController.text;
-    NicknamePost postNickname = NicknamePost(nickname: nickName, fcmToken: "ABCD123456679fdjsbfbdsfbbfddb");
+    NicknamePost postNickname = NicknamePost(nickname: nickName, fcmToken: "ABCD123456679fdjsbfbdsfbbfddgdhjaf");
     nickName = check(nickName);
     if (nickName!=null) {
       print(postNickname.nickname);
