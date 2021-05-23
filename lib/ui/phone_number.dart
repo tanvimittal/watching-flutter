@@ -33,6 +33,7 @@ class _PhoneNumberState extends State<PhoneNumber> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('api_key', user.apiKey);
         globals.apiKey = user.apiKey;
+        prefs.setInt('id', user.id);
         globals.id = user.id;
         Navigator.pushAndRemoveUntil(
           context,

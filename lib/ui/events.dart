@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:watching_flutter/model/get_events.dart';
+import 'package:watching_flutter/model/post_events.dart';
 
 import '../http_service.dart';
 import 'alert_dialog_error.dart';
@@ -22,7 +25,7 @@ class _EventsState extends State<Events>{
   List<GetEvents> _getEvents = [];
 
   // This function is used to get messages.
-  Future getMessages() async {
+  Future _getMessages() async {
     Response response;
 
     try {
@@ -31,30 +34,52 @@ class _EventsState extends State<Events>{
       if(response.statusCode == 200) {
         var getAllEvents = response.data;
         _getEvents = List<GetEvents>.from(getAllEvents.map((i) => GetEvents.fromJson(i)));
+        print(globals.id);
       } else if (response.statusCode == 500) {
         ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
       }
       setState(() {
         _isLoaded = true;
-        /**_scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeOut); */
       });
+
     } on Exception catch(e) {
       print(e);
     }
   }
 
+  // this function is used to send events to server
+  Future _postEvents(String eventName) async {
+    Response response;
+
+    try {
+      print("in post events function");
+      response = await http.postRequest("/events", data: PostEvents(name: eventName).toJson(),apiKey: globals.apiKey);
+      if(response.statusCode == 200) {
+        _getMessages();
+      } else if (response.statusCode == 500) {
+        ShowDialog.showAlertDialog(context, 'エラー', 'Some error occured on server side please try after sometime.');
+      }
+      setState(() {
+        _isLoaded = true;
+      });
+    } on Exception catch(e) {
+      print(e);
+    }
+  }
   @override
   void initState() {
     super.initState();
     http = HttpService();
-    getMessages();
+    _scrollController = ScrollController();
+    _getMessages();
   }
 
   @override
   Widget build(BuildContext context) {
+    // scroll to the bottom
+    if(_isLoaded == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) { _scrollController.jumpTo(_scrollController.position.maxScrollExtent); });
+    }
     return _isLoaded ? Column(
        children: [
          Expanded(
@@ -67,7 +92,7 @@ class _EventsState extends State<Events>{
                        return Container(
                          height: 100,
                          child: Column(
-                           crossAxisAlignment: (_getEvents[index].id == globals.id?CrossAxisAlignment.end:CrossAxisAlignment.start),
+                           crossAxisAlignment: (_getEvents[index].user.id == globals.id?CrossAxisAlignment.end:CrossAxisAlignment.start),
                            children: [
                              SizedBox(
                                height: 10,
@@ -77,7 +102,7 @@ class _EventsState extends State<Events>{
                                height: 10,
                              ),
                              Row(
-                               crossAxisAlignment: (_getEvents[index].id == globals.id?CrossAxisAlignment.end:CrossAxisAlignment.start),
+                               mainAxisAlignment: (_getEvents[index].user.id == globals.id?MainAxisAlignment.end:MainAxisAlignment.start),
                                children: [
                                  Container(
                                    //width: 200,
@@ -89,7 +114,7 @@ class _EventsState extends State<Events>{
                                    ),
                                    child: Center (
                                      child: Text(
-                                       _getEvents[index].name == 'get_up' ? '${_getEvents[index].user.nickname}が起きました！': '${_getEvents[index].user.nickname}が寝ました！',
+                                       _getEvents[index].name == 'get_up' ? '${_getEvents[index].user.nickname}さんが起きました！': '${_getEvents[index].user.nickname}さんが寝ました！',
                                        style: TextStyle(
                                          fontFamily: 'Arial',
                                          fontSize: 18,
@@ -112,18 +137,47 @@ class _EventsState extends State<Events>{
          ),
          Row(
            children: [
-             TextButton(onPressed: () {},
-                 child: Text(
-                   'おはよう'
+             SizedBox(
+               width: 10,
+             ),
+             SizedBox(
+               width: 100,
+               height: 50,
+               child: TextButton(onPressed: () => _postEvents("get_up"),
+                 style: ButtonStyle(
+                   backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
                  ),
+                 child: Text(
+                   'おはよう',
+                   style: TextStyle(
+                     color: Colors.white,
+                   ),
+                 ),
+               ),
              ),
              const Spacer(),
              SizedBox(
                width: 100,
                height: 50,
-               child: TextButton(onPressed: () {},
+               child: TextButton(onPressed: _getMessages,
                  style: ButtonStyle(
-                   backgroundColor: MaterialStateProperty.all(Colors.indigo),
+                   backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
+                 ),
+                 child: Text(
+                   '再読み込み',
+                   style: TextStyle(
+                     color: Colors.white,
+                   ),
+                 ),
+               ),
+             ),
+             const Spacer(),
+             SizedBox(
+               width: 100,
+               height: 50,
+               child: TextButton(onPressed:() => _postEvents("go_to_bed"),
+                 style: ButtonStyle(
+                   backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
                  ),
                  child: Text(
                    'おやすみ',
@@ -132,21 +186,20 @@ class _EventsState extends State<Events>{
                    ),
                  ),
                ),
-             )
-
+             ),
+             SizedBox(
+               width: 10,
+             ),
            ],
          )
        ]
     )
-
-
         : CircularProgressIndicator();
   }
 
   // This function returns messages in the format to be shown to user
   String _displayTime(String time) {
-    DateTime dateTime = DateTime.parse(time);
-    print(DateFormat.Md().add_jm().format(dateTime));
+    DateTime dateTime = DateTime.parse(time).toLocal();
     return DateFormat.Md().add_jm().format(dateTime);
   }
 

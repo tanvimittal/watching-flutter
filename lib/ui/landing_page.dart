@@ -38,6 +38,7 @@ class _LandingPageState extends State<LandingPage> {
         prefs.getString('nickname').isNotEmpty) {
       globals.apiKey = prefs.getString('api_key');
       globals.nickname = prefs.getString('nickname');
+      globals.id = prefs.getInt('id');
       setState(() => _body = CommonBottomNavigation());
     }
 
@@ -46,6 +47,7 @@ class _LandingPageState extends State<LandingPage> {
         !prefs.containsKey('nickname') &&
         prefs.getString('api_key').isNotEmpty) {
       globals.apiKey = prefs.getString('api_key');
+      globals.id = prefs.getInt('id');
       setState(() => _body = Nickname());
     }
 
