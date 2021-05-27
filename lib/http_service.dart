@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 
 class HttpService {
-  //final baseUrl = "https://watching-server-production.herokuapp.com/v1";  // production
-  final baseUrl = "https://watching-server-staging.herokuapp.com/v1"; // staging
+  //static final baseUrl = "https://watching-server-production.herokuapp.com/v1";  // production
+  static final baseUrl = "https://watching-server-staging.herokuapp.com/v1"; // staging
 
   // TODO: シングルトンでいい？
   Dio _dio;
