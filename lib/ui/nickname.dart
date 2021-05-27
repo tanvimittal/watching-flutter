@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -86,7 +88,11 @@ class _NicknameState extends State<Nickname> {
   // This function will register user on server
   void _registerNickname() {
     String nickName = myController.text;
-    NicknamePost postNickname = NicknamePost(nickname: nickName, fcmToken: "ABCD123456679fdjsbfbdsfbbfddgdhjag");
+
+    // fcmToken をランダムに作成
+    var random = Random();
+
+    NicknamePost postNickname = NicknamePost(nickname: nickName, fcmToken: "ABCD123456679fdjsbfbdsfbbfddgdhj${random.nextInt(1000)}");
     nickName = check(nickName);
     if (nickName!=null) {
       print(postNickname.nickname);
