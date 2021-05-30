@@ -12,8 +12,11 @@ import 'package:watching_flutter/globals.dart' as globals;
 import '../http_service.dart';
 
 class Nickname extends StatefulWidget {
+
+  updateFcmToken(NicknamePost nicknamePost) => createState().updateUser(nicknamePost);
   @override
   _NicknameState createState() => _NicknameState();
+
 }
 
 class _NicknameState extends State<Nickname> {
@@ -98,6 +101,7 @@ class _NicknameState extends State<Nickname> {
     if (nickName!=null) {
       print(postNickname.nickname);
       updateUser(postNickname);
+
     }
   }
 
