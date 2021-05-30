@@ -18,6 +18,7 @@ class Nickname extends StatefulWidget {
 
 class _NicknameState extends State<Nickname> {
   final myController = TextEditingController();
+
   HttpService http;
 
   // this function is used to update nickname on server
@@ -92,7 +93,7 @@ class _NicknameState extends State<Nickname> {
     // fcmToken をランダムに作成
     var random = Random();
 
-    NicknamePost postNickname = NicknamePost(nickname: nickName, fcmToken: "ABCD123456679fdjsbfbdsfbbfddgdhj${random.nextInt(1000)}");
+    NicknamePost postNickname = NicknamePost(nickname: nickName, fcmToken: globals.fcmToken);
     nickName = check(nickName);
     if (nickName!=null) {
       print(postNickname.nickname);

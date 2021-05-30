@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watching_flutter/globals.dart' as globals;
@@ -11,11 +12,16 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  FirebaseMessaging messaging;
   Widget _body = CircularProgressIndicator();
 
   @override
   void initState() {
     super.initState();
+    messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((value) => {
+     globals.fcmToken = value
+    });
     _getInitialPage();
   }
 
