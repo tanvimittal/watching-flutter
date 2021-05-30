@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watching_flutter/globals.dart' as globals;
 import 'package:watching_flutter/http_service.dart';
 import 'package:watching_flutter/model/follow_request.dart';
 import 'package:watching_flutter/model/user.dart';
-import 'package:watching_flutter/globals.dart' as globals;
+import 'package:watching_flutter/repository/user_repository.dart';
 import 'package:watching_flutter/util/phone_number_util.dart';
 
 import 'alert_dialog_error.dart';
@@ -26,14 +28,13 @@ class _UserSearchPageState extends State<UserSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          _buildContent(),
-          OverlayLoading(visible: visibleLoading),
-        ],
-      )
-    );
+        body: Stack(
+      fit: StackFit.expand,
+      children: [
+        _buildContent(),
+        OverlayLoading(visible: visibleLoading),
+      ],
+    ));
   }
 
   Container _buildContent() {
@@ -81,16 +82,23 @@ class _UserSearchPageState extends State<UserSearchPage> {
       return;
     }
 
-    setState(() {
-      visibleLoading = true;
-    });
+    // 検索処理
+    User user;
+    try {
+      setState(() {
+        visibleLoading = true;
+      });
 
-    // ここでは例外が起こったときは何事もなかったかのように振る舞う
-    User user = await _searchUserFromPhoneNumber(PhoneNumberUtil.toE164FormatFromJapanesePhoneNumber(number));
-
-    setState(() {
-      visibleLoading = false;
-    });
+      user =
+          await UserRepository.searchUserFromPhoneNumber(PhoneNumberUtil.toE164FormatFromJapanesePhoneNumber(number));
+    } on UserRepositoryException catch (e) {
+      await ShowDialog.showAlertDialog(context, 'エラー', e.message);
+      return;
+    } finally {
+      setState(() {
+        visibleLoading = false;
+      });
+    }
 
     if (user != null) {
       // 見つかった
@@ -99,56 +107,6 @@ class _UserSearchPageState extends State<UserSearchPage> {
       // 見つからなかった
       //TODO: ダイアログ表示は await しておいた方がいい？
       ShowDialog.showAlertDialog(context, 'エラー', '相手の電話番号が登録されていません。');
-    }
-  }
-
-  // TODO: To layer of Repository
-  // Dio を意識してよい。画面に依存しない？ダイアログだけは許す？
-  // TODO: Dart ドキュメントコメント
-  Future<User> _searchUserFromPhoneNumber(String phoneNumber) async {
-    try {
-      // 検索成功
-      return await _sendGetUsers(phoneNumber);
-    } on DioError catch (e) {
-      if (e.response == null) {
-        // ネットワークのエラー
-        ShowDialog.showAlertDialog(context, 'エラー', 'ネットワーク環境を確認するか、時間をおいて再度試してください。');
-      } else {
-        // サーバーのエラー
-        ShowDialog.showAlertDialog(context, 'エラー', 'サーバーからのレスポンスが不正です。');
-      }
-
-      // TODO: 検索失敗例外
-      throw e;
-    }
-  }
-
-  // TODO: To layer of API
-  // 画面に依存しない処理のみ。モデル変換の責任もここ
-  Future<User> _sendGetUsers(String phoneNumber) async {
-    final http = HttpService();
-
-    try {
-      Response response = await http.getRequest(
-        "/users",
-        apiKey: globals.apiKey,
-        queryParameters: {"phone_number": phoneNumber},
-      );
-
-      if (response.statusCode != 200) {
-        // TODO: 普通はここに来ない？ドキュメントとかで裏を取りたい。
-        assert(false);
-      }
-
-      return User.fromJson(response.data);
-    } on DioError catch (e) {
-      // 404 の時だけは特殊 (エラーではなく、見つからなかったという意味)
-      // TODO: 空の配列を返すように API を修正した方がいいかも
-      if (e.response != null && e.response.statusCode == 404) {
-        return null;
-      }
-
-      throw e;
     }
   }
 
