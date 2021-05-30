@@ -7,6 +7,7 @@ import 'package:watching_flutter/globals.dart' as globals;
 import 'package:watching_flutter/util/phone_number_util.dart';
 
 import 'alert_dialog_error.dart';
+import 'overlay_loading.dart';
 
 /// 相手を探す 画面
 ///
@@ -20,41 +21,53 @@ class UserSearchPage extends StatefulWidget {
 class _UserSearchPageState extends State<UserSearchPage> {
   final _phoneNumberController = TextEditingController();
 
+  bool visibleLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          padding: const EdgeInsets.all(40.0),
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "見守りたい相手の電話番号を入れてください。",
-                style: TextStyle(fontSize: 18.0),
-              ),
-              SizedBox(
-                height: 8.0,
-              ),
-              PhoneNumberUtil.buildTextFieldForPhoneNumber(
-                controller: _phoneNumberController,
-                onChanged: (String s) {
-                  setState(() {
-                    // 送信ボタンを Enable にするためだけの setState()
-                    // TODO: Is there more smart way?
-                  });
-                },
-              ),
-              SizedBox(
-                height: 16.0,
-              ),
-              ElevatedButton(
-                onPressed: PhoneNumberUtil.isValidForInputting(_phoneNumberController.text) ? _searchUser : null,
-                //onPressed: _searchUser,
-                child: Text('探す'),
-              )
-            ],
-          )),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildContent(),
+          OverlayLoading(visible: visibleLoading),
+        ],
+      )
     );
+  }
+
+  Container _buildContent() {
+    return Container(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "見守りたい相手の電話番号を入れてください。",
+              style: TextStyle(fontSize: 18.0),
+            ),
+            SizedBox(
+              height: 8.0,
+            ),
+            PhoneNumberUtil.buildTextFieldForPhoneNumber(
+              controller: _phoneNumberController,
+              onChanged: (String s) {
+                setState(() {
+                  // 送信ボタンを Enable にするためだけの setState()
+                  // TODO: Is there more smart way?
+                });
+              },
+            ),
+            SizedBox(
+              height: 16.0,
+            ),
+            ElevatedButton(
+              onPressed: PhoneNumberUtil.isValidForInputting(_phoneNumberController.text) ? _searchUser : null,
+              //onPressed: _searchUser,
+              child: Text('探す'),
+            )
+          ],
+        ));
   }
 
   void _searchUser() async {
@@ -68,8 +81,16 @@ class _UserSearchPageState extends State<UserSearchPage> {
       return;
     }
 
+    setState(() {
+      visibleLoading = true;
+    });
+
     // ここでは例外が起こったときは何事もなかったかのように振る舞う
     User user = await _searchUserFromPhoneNumber(PhoneNumberUtil.toE164FormatFromJapanesePhoneNumber(number));
+
+    setState(() {
+      visibleLoading = false;
+    });
 
     if (user != null) {
       // 見つかった
@@ -180,6 +201,10 @@ class _UserSearchPageState extends State<UserSearchPage> {
   }
 
   void _sendFollowRequest(int userId) async {
+    setState(() {
+      visibleLoading = true;
+    });
+
     try {
       await _sendPostFollowRequests(userId);
 
@@ -195,6 +220,10 @@ class _UserSearchPageState extends State<UserSearchPage> {
         ShowDialog.showAlertDialog(context, 'エラー', 'サーバーからのレスポンスが不正です。');
       }
     }
+
+    setState(() {
+      visibleLoading = false;
+    });
   }
 
   // TODO: To layer of API
