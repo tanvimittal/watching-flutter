@@ -1,4 +1,4 @@
-package jp.kyuuki.watching.watching_flutter
+package jp.kyuuki.watching.flutter
 
 import io.flutter.embedding.android.FlutterActivity
 

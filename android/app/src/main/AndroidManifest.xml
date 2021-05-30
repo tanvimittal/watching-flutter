@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jp.kyuuki.watching.watching_flutter">
+    package="jp.kyuuki.watching.flutter">
    <application
         android:label="watching_flutter"
         android:icon="@mipmap/ic_launcher">
