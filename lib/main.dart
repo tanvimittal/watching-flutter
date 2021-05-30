@@ -4,7 +4,7 @@ import 'package:watching_flutter/ui/phone_number.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 
-void main() async{
+Future<void> main() async{
   // referred Andrea's video for initializing firebase app
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
