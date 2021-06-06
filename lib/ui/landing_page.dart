@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watching_flutter/globals.dart' as globals;
 import 'package:watching_flutter/model/nickname_post.dart';
@@ -8,8 +9,28 @@ import 'package:watching_flutter/ui/common_bottom_navigation.dart';
 import 'package:watching_flutter/ui/nickname.dart';
 import 'package:watching_flutter/ui/phone_number.dart';
 
+
+
 Future<void> _messageHandler(RemoteMessage message) async {
   if (Firebase.apps.isEmpty) await Firebase.initializeApp();
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  AndroidNotificationDetails(
+      'your channel id', 'your channel name', 'your channel description',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker');
+
+  
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
+  );
+
+  await flutterLocalNotificationsPlugin.show(
+      0, 'plain title', 'plain body', platformChannelSpecifics,
+      payload: 'item x');
   print('Handling a background message ${message.messageId}');
   print(message.data.toString());
 }
@@ -101,8 +122,8 @@ class _LandingPageState extends State<LandingPage> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text(event.notification.title),
-                  content: Text(event.notification.body),
+                  title: Text("notification"),
+                  content: Text("body"),
                   actions: [
                     TextButton(onPressed: () {
                       Navigator.of(context).pop();

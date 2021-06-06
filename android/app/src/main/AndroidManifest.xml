@@ -2,6 +2,7 @@
     package="jp.kyuuki.watching.flutter">
    <application
         android:label="watching_flutter"
+        android:name=".Application"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
