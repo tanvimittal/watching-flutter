@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
 
+import 'config.dart';
+
 class HttpService {
-  //static final baseUrl = "https://watching-server-production.herokuapp.com/v1";  // production
-  static final baseUrl = "https://watching-server-staging.herokuapp.com/v1"; // staging
+  static final baseUrl = Config.apiBaseUrl;
+
+  static const delayTimeMilliseconds = 1000;  // Only for debug mode
 
   // TODO: シングルトンでいい？
   Dio _dio;
@@ -32,6 +35,10 @@ class HttpService {
       });
     }
 
+    if (Config.isRelease == false) {
+      await Future.delayed(const Duration(milliseconds: delayTimeMilliseconds), () {});
+    }
+
     return await _dio.get(
       endPoint,
       queryParameters: queryParameters,
@@ -49,6 +56,10 @@ class HttpService {
       });
     }
 
+    if (Config.isRelease == false) {
+      await Future.delayed(const Duration(milliseconds: delayTimeMilliseconds), () {});
+    }
+
     return await _dio.post(
       endPoint,
       data: data,
@@ -64,6 +75,10 @@ class HttpService {
       options = Options(headers: {
         "x-api-key": apiKey,
       });
+    }
+
+    if (Config.isRelease == false) {
+      await Future.delayed(const Duration(milliseconds: delayTimeMilliseconds), () {});
     }
 
     return await _dio.put(
